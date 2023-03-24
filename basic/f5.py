@@ -48,13 +48,17 @@ def login():
         upw = request.form.get('upw') # 암호는 차후에 암호화 해야 함 (관리자도 볼 수 없다 -> 일반적으로 해싱을 통해 원값을 모르게 함)
         print(uid, upw)
         # 2. 회원 여부 쿼리
-        select_login(uid, upw)
+        result = select_login(uid, upw)
         # 3. 회원이면
+        if result:
             # 3-1. 세션 생성, 기타 필요한 조치 수행
             # 3-2. 서비스 메인 화면으로 이동
+            pass
         # 4. 회원 아니면
+        else:
             # 4-1. 적당한 메시지 후 다시 로그인 유도
-        return redirect('https://www.naver.com') # redirect : 요청을 다른 URL로 포워딩
+            return render_template('error.html')
+        # return redirect('https://www.naver.com') # redirect : 요청을 다른 URL로 포워딩
 
 if __name__ == "__main__":
     app.run(debug=True)
