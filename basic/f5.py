@@ -27,16 +27,23 @@
 '''
 from d4 import select_login
 
-from flask import Flask, render_template, jsonify, request, redirect, url_for
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session
 
 app = Flask(__name__)
+# 세션을 위해서 시크릿키 지정
+app.secret_key = 'asdliofhjoai'  # 임의값, 통상 해시값 활용
+
+# 로그인을 하여 세션을 얻은 후 홈페이지를 진입해야 사이트의 내용을 보여주겠다
+@app.route('/')
+def home():
+    if not 'uid' in session:         # 세션 안에 uid 값이 존재하는가?
+        # return redirect('/login')  # URL을 사용할 때는 하드코딩 하지 않는다
+        # url_for(가고 싶은 url과 연결된 함수명 기입)
+        return redirect(url_for('login'))
+    return 'HELLO WORLD'
 
 # @app.route() -> 기본적으로 GET 방식
 # 메소드 추가는 method=['POST', ..]
-@app.route('/')
-def home():
-    return 'HELLO'
-
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     # 메소드별 분기
@@ -51,9 +58,14 @@ def login():
         result = select_login(uid, upw)
         # 3. 회원이면
         if result:
+            # 세션 : 클라이언트 정보를 서버가 유지하여서, 간편하게 웹을 이용할 수 있게 도움을 줌
+            #        클라이언트가 간편하게 웹을 이용할 수 있도록 도움을 줌
+            #        단점 : 접속 유저가 많으면 서버측 메모리에 부하가 온다 -> 대체제 / 대안 필요
+            #        JWT(TOKEN)를 사용하여 보완(사이트 구성시 인증쪽에서 활용 : 차주 진행)
             # 3-1. 세션 생성, 기타 필요한 조치 수행
+            session['uid'] = uid
             # 3-2. 서비스 메인 화면으로 이동
-            pass
+            return redirect(url_for('home'))
         # 4. 회원 아니면
         else:
             # 4-1. 적당한 메시지 후 다시 로그인 유도
