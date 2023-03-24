@@ -3,7 +3,7 @@
 '''
 import pymysql as my
 
-def select_login():
+def select_login(uid, upw):
     connection = None
     try:
         connection = my.connect(host        = 'localhost',  
@@ -27,7 +27,7 @@ def select_login():
                     `upw` = %s;
             '''
             # execute() 함수의 2번 인자가 파라미터 전달하는 자리, 튜플로 표현
-            cursor.execute(sql, ('guest', '1234'))
+            cursor.execute(sql, (uid, upw))
             row = cursor.fetchone()
             print( row['name'] )
     except Exception as e:
@@ -40,4 +40,4 @@ def select_login():
 
 # d4 개발자의 테스트 코드 -> 다른데서 땡겨쓸 때 호출되지 않도록(2번 수행되지 않도록) 하기 위함
 if __name__ == "__main__":
-    select_login()
+    select_login('guest', '1234')
