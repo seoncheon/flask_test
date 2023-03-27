@@ -7,8 +7,15 @@
 from flask import render_template, request
 # 엔트리포인트가 step2_app_factory이므로 그 아래의 service.controller의 __init__.py에서 bp_main을 들고온다
 from service.controllers import bp_main as main
+from service.forms import FormQuestion
 
 # 127.0.0.1/main/
 @main.route('/')
 def home():
     return render_template('index.html')
+
+# # 127.0.0.1/main/question 
+@main.route('/question')
+def question():
+    form = FormQuestion()
+    return render_template('question.html', wtf=form)
