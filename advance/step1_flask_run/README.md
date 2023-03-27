@@ -10,6 +10,7 @@
             - flask run
         2. 환경변수 파일을 읽어서 처리
             - conda install python-dotenv -y
+            - pip install python-dotenv
             - 파일 생성
                 - env.config
                 - start_app.py
