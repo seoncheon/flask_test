@@ -8,7 +8,7 @@ def home():
     # print(url_for('auth_bp.login'))
     return 'auth home'
 
-@auth.route('/logi')
+@auth.route('/login')
 def login():
     return 'auth login'
 

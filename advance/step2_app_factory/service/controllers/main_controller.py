@@ -11,4 +11,4 @@ from service.controllers import bp_main as main
 # 127.0.0.1/main/
 @main.route('/')
 def home():
-    return 'main home'
+    return render_template('index.html')
