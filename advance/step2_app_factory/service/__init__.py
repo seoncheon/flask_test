@@ -1,4 +1,10 @@
 from flask import Flask
+# TODO: ORM을 위한 추가
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+db = SQLAlchemy()
+migrate = Migrate()
 
 '''
     create_app은 플라스크 내부에서 정의된 함수명(수정X)
@@ -13,6 +19,8 @@ def create_app():
     init_environment( app )
     # 블루프린트 초기화
     init_bluprint( app )
+    # 데이터베이스 초기화
+    init_database( app )
 
     return app
 
@@ -45,4 +53,15 @@ def init_bluprint(app):
     app.register_blueprint(bp_main)
     # 실습 http://127.0.0.1:5000/auth/ 접속시 인증 홈이란 내용이 나오도록
     # auth 관련 블루프린트 구성
-    app.register_blueprint(bp_auth)    
+    app.register_blueprint(bp_auth)
+
+def init_database(app):
+    # pool
+    from .model import pool_sql
+    pool_sql.init_pool()
+    # 테스트
+    print(pool_sql.login('guest', '1234'))
+    # ORM을 위한 flask 객체와 sqlalchemy 객체, migrate 객체 연결
+    db.init_app( app )
+    migrate.init_app( app, db ) 
+    from .model import models
