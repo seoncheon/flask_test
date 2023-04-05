@@ -224,3 +224,30 @@
                     db.session.commit()
                 ```
             - 답변 등록
+                ```
+                    # 질문 1개를 찾고 -> 답변을 등록
+                    >>> a1 = Answer(question=q2, content="답변1", reg_date=datetime.now())
+                    # 등록
+                    >>> db.session.add(a1)
+                    # 커밋
+                    >>> db.session.commit()
+                    +----+-------------+---------+---------------------+
+                    | id | question_id | content | reg_date            |
+                    +----+-------------+---------+---------------------+
+                    |  1 |           2 | 답변1   | 2023-04-05 13:12:42 |
+                    +----+-------------+---------+---------------------+
+                ```
+            - 답변을 통해 질문 찾기
+                ```
+                    a1.question
+                ```
+            - 질문을 통해 답변 찾기
+                ```
+                    # 역참조 이름을 사용하여 답변들을 다 찾아온다
+                    q2.answer_set
+                ```
+            - 질문을 삭제하면 답변도 다 삭제되는가? -> answer의 question_id만 Null값으로 바뀜 : answer에서 직접 delete해야 완전 삭제
+                ```
+                    db.session.delete(q2)
+                    db.session.commit()
+                ```
