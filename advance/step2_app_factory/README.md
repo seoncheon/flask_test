@@ -105,3 +105,84 @@
         - flask-migrate, sqlalchemy
     - 설치
         - pip install sqlalchemy flask-migrate
+    - 코드 작성
+        ```
+        from flask_sqlalchemy import SQLAlchemy
+        from flask_migrate import Migrate
+
+        db = SQLAlchemy()
+        migrate = Migrate()
+
+        db.init_app(app)
+        migrate.init_app(app)
+        < service의 __init__.py >
+
+        ---------------------------------------------
+     
+        # ORM 처리를 위한 환경변수 설정 (임의 설정)
+        DB_PROTOCOL = "mysql+pymysql"
+        DB_USER     = "root"
+        DB_PASSWORD = "rlalrlal3"
+        DB_HOST     = "127.0.0.1"
+        DB_PORT     = 3306
+        DB_DATABASE = "my_db" # 새로 만들, 이 서비스에서 사용한 데이터베이스명
+
+        # 이 환경변수는 migrate가 필수로 요구하는 환경변수
+        SQLALCHEMY_DATABASE_URI=f"{DB_PROTOCOL}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DATABASE}"
+        # sqlalchemy modify 비활성 ( SQLALCHEMY_DATABASE_URI와 세트로 사용 )
+        SQLALCHEMY_TRACK_MODIFICATIONS=False
+        < config의 __init__.py >
+        ```
+
+        - 데이터베이스 생성, 초기화
+            - --app service 은 없어도 되는데, 이 앱은 app or wsfi로 시작하는 엔트리가 없어서 별도로 지정해야 한다
+            - flask --app service db init
+                - sqlite : 소형 데이터베이스, 스마트폰에 사용하는 DB. 이 경우에는 데이터베이스 생성을 자동으로 해준다
+                           파일럿 형태에서 사용
+                - mysql 같은 데이터베이스(케이스별로 상이)는 실제로는 생성 안됨
+            - 이를 실행하면 migrations 폴더가 생긴다 (내부는 자동으로 만들어지는 구조 -> 관여하지 않는다)
+                - 단, versions 밑으로 수정할 때마다 새로운 버전의 DB 관련 파일이 생성된다
+
+        - 모델(테이블) 생성, 변경
+            - model > models.py에 테이블 관련 내용 기술
+            - service > __init__.py
+                - from .model import models : 주석 해제 or 신규 작성
+            - flask --app service db migrate
+            +-----------------+
+            | Tables_in_my_db |
+            +-----------------+
+            | alembic_version |
+            +-----------------+
+            1 row in set (0.001 sec)
+
+        - 모델(테이블) 생성, 변경 후 데이터베이스에 적용 : 일종의 커밋
+            - flask --app service db upgrade
+            +-----------------+
+            | Tables_in_my_db |
+            +-----------------+
+            | alembic_version |
+            | answer          |
+            | question        |
+            +-----------------+
+
+        - 컨테이너 이미지 생성시
+            - 위의 명령들 3개를 차례대로 수행해서 데이터베이스 초기화 및 생성과정을 수행
+
+    - 필요한 기능들 시뮬레이션
+        - DBA는 SQL문을 작성해서 쿼리 구현
+        - ORM에서는 shell을 열어서 파이썬 코드로 구현
+        - flask --app service shell
+            - 질문 등록
+            - 질문 조회
+            - 답변 등록
+                ...
+            ```
+            >>> from service.model.models import Question, Answer 
+            >>> from datetime import datetime
+            >>> from service import db
+
+            >>> q1 = Question(title="질문1", content="내용1", reg_date=datetime.now())
+            >>> db.session.add(q1)
+            >>> db.session.commit()
+            < table에 데이터 밀어넣기 >
+            ```
