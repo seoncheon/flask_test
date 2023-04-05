@@ -173,16 +173,54 @@
         - ORM에서는 shell을 열어서 파이썬 코드로 구현
         - flask --app service shell
             - 질문 등록
-            - 질문 조회
-            - 답변 등록
-                ...
-            ```
-            >>> from service.model.models import Question, Answer 
-            >>> from datetime import datetime
-            >>> from service import db
+                ```
+                    >>> from service.model.models import Question, Answer 
+                    >>> from datetime import datetime
+                    >>> from service import db
 
-            >>> q1 = Question(title="질문1", content="내용1", reg_date=datetime.now())
-            >>> db.session.add(q1)
-            >>> db.session.commit()
-            < table에 데이터 밀어넣기 >
-            ```
+                    >>> q1 = Question(title="질문1", content="내용1", reg_date=datetime.now())
+                    >>> db.session.add(q1)
+                    >>> db.session.commit()
+                    < table에 데이터 밀어넣기 >
+                ```
+            - 질문 조회
+                ```
+                    # 전체 데이터 조회
+                    >>> Question.query.all()
+                    [<Question 1>]
+                    >>> qs = Question.query.all()
+                    >>> qs[0]
+                    <Question 1>
+                    >>> qs[0].title
+                    '질문1'
+                    
+                    # id 값을 넣어서 조회 : select * from quetion where id = 1;
+                    Question.query.get(1)
+                    
+                    # 내용중 '용'이라는 문자열이 존재하면 다 가져오시오 : select * from question where content like '%용%';
+                    # %용% : '용' 앞뒤로 어떤 글자가 있던 상관X  / %용 : 마지막 글자가 무조건 '용' / 용% : 시작 글자가 무조건 '용'
+                    >>> Question.query.filter(Question.content.like('%용%')).all()
+                    [<Question 1>]
+                ```
+            - 질문 수정
+                ```
+                    >>> q1 = Question.query.get(1)
+                    >>> q1
+                    <Question 1>
+                    >>> q1.title
+                    '질문1'
+                    # 변경하고 싶은 부분 수정
+                    # update question set title='질문2' where id=1;
+                    >>> q1.title = "질문2"      
+                    >>> db.session.commit()
+                    >>> q1.title
+                    '질문2'
+                ```
+            - 질문 삭제
+                ```
+                    q1 = Question.query.get(1)
+                    # delete from question where id=1;
+                    db.session.delete(q1)
+                    db.session.commit()
+                ```
+            - 답변 등록
